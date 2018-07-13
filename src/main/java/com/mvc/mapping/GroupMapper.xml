@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.dao.GroupDao">
+
+    <insert id="createGroup" parameterType="com.mvc.model.Group">
+        insert into group_info(group_id, group_name, group_owner, group_type, created_time, start_time, duration_days, amount)
+        values(#{groupId}, #{groupName}, #{groupOwnerWxid}, #{groupType}, #{createTime}, #{startTime}, #{durationDays}, #{amount})
+    </insert>
+
+    <select id="queryTest" resultType="java.lang.String">
+        select group_id from group_info limit 1;
+    </select>
+
+</mapper>
