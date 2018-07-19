@@ -4,8 +4,8 @@
 <mapper namespace="com.mvc.dao.GroupDao">
 
     <insert id="createGroup" parameterType="com.mvc.model.Group">
-        insert into group_info(group_id, group_name, group_owner, group_type, created_time, start_time, duration_days, amount)
-        values(#{groupId}, #{groupName}, #{groupOwnerWxid}, #{groupType}, #{createTime}, #{startTime}, #{durationDays}, #{amount})
+        insert into group_info(group_id, group_name, group_owner, group_type, created_time, start_time, duration_days, amount, check_time_from, check_time_to)
+        values(#{groupId}, #{groupName}, #{groupOwnerWxid}, #{groupType}, #{createTime}, #{startTime}, #{durationDays}, #{amount}, #{checkTimeFrom}, #{checkTimeTo})
     </insert>
 
     <select id="queryTest" resultType="java.lang.String">

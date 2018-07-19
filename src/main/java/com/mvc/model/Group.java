@@ -17,18 +17,31 @@ public class Group {
     private String startTime;
     private int durationDays;
     private int amount;
+    private String checkTimeFrom;
+    private String checkTimeTo;
+    private int walkTarget;
 
-    public Group(String groupName, String groupOwnerWxid, String groupType, String startTime, int durationDays,
-                 int amount) {
+    public Group(String groupName, String groupOwnerWxid) {
         this.groupName = groupName;
         this.groupOwnerWxid = groupOwnerWxid;
-        this.groupType = GroupType.valueOf(groupType);
+        DateTime dt = new DateTime();
+        this.createTime = dt.toString("yyyy-MM-dd HH:mm:ss");
+        this.groupId = genGroupId(groupName, groupOwnerWxid, this.createTime);
+    }
+
+    public Group(String groupName, String groupOwnerWxid, String groupType, String startTime, int durationDays,
+                 int amount, String checkTimeFrom, String checkTimeTo) {
+        this.groupName = groupName;
+        this.groupOwnerWxid = groupOwnerWxid;
+        this.groupType = GroupType.valueOf(groupType.toUpperCase());
         DateTime dt = new DateTime();
         this.createTime = dt.toString("yyyy-MM-dd HH:mm:ss");
         this.startTime = startTime;
         this.durationDays = durationDays;
         this.amount = amount;
         this.groupId = genGroupId(groupName, groupOwnerWxid, this.createTime);
+        this.checkTimeFrom = checkTimeFrom;
+        this.checkTimeTo = checkTimeTo;
     }
 
     private String genGroupId(String groupName, String groupOwnerWxid, String createTime) {
@@ -105,4 +118,29 @@ public class Group {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
+    public String getCheckTimeFrom() {
+        return checkTimeFrom;
+    }
+
+    public void setCheckTimeFrom(String checkTimeFrom) {
+        this.checkTimeFrom = checkTimeFrom;
+    }
+
+    public String getCheckTimeTo() {
+        return checkTimeTo;
+    }
+
+    public void setCheckTimeTo(String checkTimeTo) {
+        this.checkTimeTo = checkTimeTo;
+    }
+
+    public int getWalkTarget() {
+        return walkTarget;
+    }
+
+    public void setWalkTarget(int walkTarget) {
+        this.walkTarget = walkTarget;
+    }
+
 }

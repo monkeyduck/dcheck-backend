@@ -1,5 +1,7 @@
 package com.utils;
 
+import com.mvc.model.Group;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
 
@@ -22,6 +24,12 @@ public class Utils {
     public static String encodeMD5(String data) {
         md.reset();
         return Base64.encodeBase64URLSafeString(md.digest(StringUtils.getBytesUtf8(data)));
+    }
+
+    public static JSONObject genGroupInfoJson(Group group) {
+        JSONObject json = JSONObject.fromObject(group);
+        System.out.println(json.toString());
+        return json;
     }
 
     public static void main(String[] args) {

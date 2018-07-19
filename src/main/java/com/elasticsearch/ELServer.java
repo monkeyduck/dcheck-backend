@@ -1,6 +1,5 @@
 package com.elasticsearch;
 
-import net.sf.json.JSONArray;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -16,6 +15,8 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -29,15 +30,18 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  * Created by linchuanli on 2018/7/11.
  */
 public class ELServer {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ELServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(ELServer.class);
     private static final String serverIp = "127.0.0.1";      // 内网ip
-    //    private static final String serverIp = "101.201.103.114";
+//        private static final String serverIp = "101.201.103.114";
     private static TransportClient client;
 
     static {
         try{
             Settings settings = Settings.builder()
-                    .put("cluster.name", "llc-cluster").build();
+//                    .put("cluster.name", "my-application")
+                    .put("client.transport.sniff", true) //自动嗅探整个集群的状态，把集群中其他ES节点的ip添加到本地的客户端列表中.build();
+                    .build();
+// Settings settings = Settings.builder().build();
             client = new PreBuiltTransportClient(settings)
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(serverIp), 9300));
 
@@ -47,11 +51,12 @@ public class ELServer {
     }
 
     public void doIndex(){
-        String index = "el-2016-12-20";
-        String type = "stat";
+        String index = "group";
+        String type = "info";
+        String groupId = "djlafje";
         IndexResponse response = null;
         try {
-            response = client.prepareIndex("el-2016-12-20", "stat")
+            response = client.prepareIndex(index, type, groupId)
                     .setSource(jsonBuilder()
                             .startObject()
                             .field("user", "llc")
@@ -79,7 +84,7 @@ public class ELServer {
                 .setQuery(QueryBuilders.termQuery("message", "trying out Elasticsearch"))
 //                .setPostFilter(QueryBuilders.rangeQuery("age").from(12).to(18))     // Filter
                 .get();
-        logger.info("Response: " + response.toString());
+//        logger.info("Response: " + response.toString());
     }
 
     public List<String> getComplexLogByDate(String date, String memberId, String deviceId, String module, String level, String env,
@@ -131,34 +136,36 @@ public class ELServer {
             } while(scrollResp.getHits().getHits().length != 0);
 
         } catch (Exception e) {
-            logger.error(e.getMessage() + "index: " + "el-" + date);
+//            logger.error(e.getMessage() + "index: " + "el-" + date);
         }
         return logList;
     }
 
 
 
-    private JSONArray convert2JsonArray(SearchResponse response) {
-        logger.info("Start to convert response to json ...");
-        if (response == null) logger.info("response is null.");
-        List<String> list = new ArrayList<>();
-        try {
-            SearchHit[] results = response.getHits().getHits();
-            String sourceAsString = "";
-            for (SearchHit hit : results) {
-                sourceAsString = hit.getSourceAsString();
-                if (sourceAsString != null) {
-                    list.add(sourceAsString);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Convert to JsonArray error: " + e.getMessage());
-        }
-        JSONArray jsonArray = JSONArray.fromObject(list);
-        return jsonArray;
-    }
+//    private JSONArray convert2JsonArray(SearchResponse response) {
+////        logger.info("Start to convert response to json ...");
+//        if (response == null)
+////            logger.info("response is null.");
+//        List<String> list = new ArrayList<>();
+//        try {
+//            SearchHit[] results = response.getHits().getHits();
+//            String sourceAsString = "";
+//            for (SearchHit hit : results) {
+//                sourceAsString = hit.getSourceAsString();
+//                if (sourceAsString != null) {
+//                    list.add(sourceAsString);
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.error("Convert to JsonArray error: " + e.getMessage());
+//        }
+//        JSONArray jsonArray = JSONArray.fromObject(list);
+//        return jsonArray;
+//    }
 
     public static void main(String[] args) {
+        logger.info("Run...");
         ELServer server = new ELServer();
         server.doIndex();
     }

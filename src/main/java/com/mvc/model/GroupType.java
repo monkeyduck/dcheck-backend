@@ -4,7 +4,7 @@ package com.mvc.model;
  * Created by linchuanli on 2018/7/11.
  */
 public enum GroupType {
-    GET_UP("getUp"), WALK("walk");
+    GETUP("getup"), WALK("walk");
 
     private String type;
 

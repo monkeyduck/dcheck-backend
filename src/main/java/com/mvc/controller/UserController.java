@@ -1,6 +1,5 @@
 package com.mvc.controller;
 
-import com.Main;
 import com.mvc.model.User;
 import com.mvc.service.UserService;
 import org.apache.ibatis.annotations.Param;
