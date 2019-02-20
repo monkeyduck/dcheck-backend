@@ -6,8 +6,8 @@ package com.mvc.model;
 public class WalkGroup extends Group {
     private int walkTarget;
 
-    public WalkGroup(String groupName, String groupOwnerWxid, int walkTarget) {
-        super(groupName, groupOwnerWxid);
+    public WalkGroup(String groupName, String groupOwnerWxid, String startTime, int walkTarget) {
+        super(groupName, groupOwnerWxid, startTime);
         this.walkTarget = walkTarget;
     }
 

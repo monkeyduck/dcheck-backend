@@ -2,6 +2,9 @@ package com.mvc.model;
 
 import com.utils.Utils;
 import org.joda.time.DateTime;
+import org.springframework.jdbc.support.nativejdbc.OracleJdbc4NativeJdbcExtractor;
+
+import java.util.*;
 
 
 /**
@@ -12,7 +15,7 @@ public class Group {
     private String groupId;
     private String groupName;
     private String groupOwnerWxid;
-    private GroupType groupType;
+    private String groupType;
     private String createTime;
     private String startTime;
     private int durationDays;
@@ -20,32 +23,57 @@ public class Group {
     private String checkTimeFrom;
     private String checkTimeTo;
     private int walkTarget;
+    List<String> members;
+    Map<String, Map<String, CheckRecord>> checkDetail;
 
-    public Group(String groupName, String groupOwnerWxid) {
+    public Group() {}
+
+    public Group(String groupName, String groupOwnerWxid, String startTime) {
         this.groupName = groupName;
         this.groupOwnerWxid = groupOwnerWxid;
         DateTime dt = new DateTime();
         this.createTime = dt.toString("yyyy-MM-dd HH:mm:ss");
-        this.groupId = genGroupId(groupName, groupOwnerWxid, this.createTime);
+        this.startTime = startTime;
+        this.groupId = genGroupId(groupName, groupOwnerWxid, startTime);
+        members = new ArrayList<>();
+        members.add(groupOwnerWxid);
+        checkDetail = new HashMap<>();
+        initCheckDetails(this.groupOwnerWxid, this.startTime, this.durationDays);
     }
 
     public Group(String groupName, String groupOwnerWxid, String groupType, String startTime, int durationDays,
                  int amount, String checkTimeFrom, String checkTimeTo) {
         this.groupName = groupName;
         this.groupOwnerWxid = groupOwnerWxid;
-        this.groupType = GroupType.valueOf(groupType.toUpperCase());
+        this.groupType = groupType;
         DateTime dt = new DateTime();
         this.createTime = dt.toString("yyyy-MM-dd HH:mm:ss");
         this.startTime = startTime;
         this.durationDays = durationDays;
         this.amount = amount;
-        this.groupId = genGroupId(groupName, groupOwnerWxid, this.createTime);
+        this.groupId = genGroupId(groupName, groupOwnerWxid, startTime);
         this.checkTimeFrom = checkTimeFrom;
         this.checkTimeTo = checkTimeTo;
+        members = new ArrayList<>();
+        members.add(groupOwnerWxid);
+        checkDetail = new HashMap<>();
+        initCheckDetails(this.groupOwnerWxid, this.startTime, this.durationDays);
     }
 
-    private String genGroupId(String groupName, String groupOwnerWxid, String createTime) {
-        String data = groupName + groupOwnerWxid + createTime;
+
+    public void initCheckDetails(String wxId, String startDate, int duration) {
+        DateTime dtStart = new DateTime(startDate);
+        for (int i = 0; i < duration; ++i) {
+            DateTime dt = dtStart.plusDays(i);
+            String sDate = dt.toString("yyyy-MM-dd");
+            Map<String, CheckRecord> recordMap = new HashMap<>();
+            recordMap.put(wxId, new CheckRecord());
+            this.checkDetail.put(sDate, recordMap);
+        }
+    }
+
+    private String genGroupId(String groupName, String groupOwnerWxid, String startTime) {
+        String data = groupName + groupOwnerWxid + startTime;
         String originalResult = Utils.encodeMD5(data);
         if (originalResult.length() <= GROUP_ID_MAX_LENGTH) {
             return originalResult;
@@ -53,6 +81,17 @@ public class Group {
         else {
             return originalResult.substring(0, GROUP_ID_MAX_LENGTH);
         }
+    }
+
+    public void addMember(String wxId) throws Exception {
+        if (this.members.contains(wxId)) throw new Exception("add duplicate members!");
+        Iterator<Map.Entry<String, Map<String, CheckRecord>>> iterator = this.checkDetail.entrySet().iterator();
+
+        while(iterator.hasNext()) {
+            Map<String, CheckRecord> map = iterator.next().getValue();
+            map.put(wxId, new CheckRecord());
+        }
+        this.members.add(wxId);
     }
 
     public String getGroupId() {
@@ -80,11 +119,11 @@ public class Group {
     }
 
     public String getGroupType() {
-        return groupType.getType();
+        return groupType;
     }
 
     public void setGroupType(String groupType) {
-        this.groupType = GroupType.valueOf(groupType);
+        this.groupType = groupType;
     }
 
     public String getCreateTime() {
@@ -143,4 +182,19 @@ public class Group {
         this.walkTarget = walkTarget;
     }
 
+    public List<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<String> members) {
+        this.members = members;
+    }
+
+    public Map<String, Map<String, CheckRecord>> getCheckDetail() {
+        return checkDetail;
+    }
+
+    public void setCheckDetail(Map<String, Map<String, CheckRecord>> checkDetail) {
+        this.checkDetail = checkDetail;
+    }
 }
